@@ -141,14 +141,18 @@ export default function App() {
   const handlePredict = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/predict', answers);
+      // Live Vercel Backend URL
+      const res = await axios.post('https://ceylonplanx-new-backend.vercel.app/api/predict', answers);
       setResult(res.data.recommendation);
       setStep(8);
 
       // Save prediction to Firebase
-      await savePredictionToFirebase(answers, res.data.recommendation.title);
+      if (res.data.recommendation && res.data.recommendation.title) {
+        await savePredictionToFirebase(answers, res.data.recommendation.title);
+      }
     } catch (err) {
-      alert("Backend server is not running. Please run 'uvicorn main:app --reload'.");
+      console.error(err);
+      alert("Unable to connect to backend server. Please verify your Vercel backend URL.");
     } finally {
       setLoading(false);
     }
